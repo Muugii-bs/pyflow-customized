@@ -12,9 +12,9 @@ Run the following steps to download, install and demo the library:
   """
   prepare-video.py:
     input: 
-      <input file>: the path of the target video (name of the file)
-      <fps>: frame per second (number of frame)
-      <skip>: skip interval for choosing the base image (seconds)
+      <input file>: the path/name of the target video
+      <fps>: defines the "frames per second"
+      <skip>: defines how many seconds skipped to choose the base image
     output:
       flow images saved in <input file> (without the '.jpg' extension) + '/flows'
   """
