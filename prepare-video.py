@@ -4,16 +4,28 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
-import time, argparse, sys, os
+import time, argparse, sys, os, re, subprocess
 
 import numpy as np
 from PIL import Image
-import pyflow
-import cv2
+import pyflow, cv2
 
-video_name, fps, skip_seconds = sys.argv[1], sys.argv[2], int(sys.argv[3])
+video_name, fps, skip_seconds, step = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
 frames_path = video_name.split('.')[0]
-flows_path = frames_path + '/flows'
+#flows_path = frames_path + '/flows'
+
+def getLength(filename):
+  result = subprocess.Popen(["ffprobe", filename],
+    stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+  a = [x for x in result.stdout.readlines() if "Duration" in x][0].rstrip().lstrip()
+  m = re.search(r"(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)", a, re.U).groups(1)
+  return int(m[0]) * 60 * 60 + int(m[1]) * 60 + int(m[2])
+
+
+def create_flows_path():
+    duration = getLength(video_name)
+    for i in range(1, int(duration / step + 1)):
+        os.system("mkdir -m 755 {0}".format(frames_path + '/flows' + str(i)))
 
 
 def create_frames():
@@ -61,7 +73,8 @@ def create_flows(im1, im2, wrapp_file, flow_file):
 if __name__ == '__main__':
     create_frames()
     print('frames path: {0}'.format(frames_path))
-
+    create_flows_path()
+    """
     # Get the base & target images
     base_num = int(fps) * skip_seconds + 1
     base_img = None
@@ -83,4 +96,5 @@ if __name__ == '__main__':
                 '{0}/wrappImage{1}.png'.format(flows_path, str(frame_num)), 
                 '{0}/flowImage{1}.jpg'.format(flows_path, str(frame_num)))
     print('flows path: {0}'.format(flows_path))
+    """
 
