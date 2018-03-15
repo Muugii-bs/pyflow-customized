@@ -7,7 +7,7 @@ Run the following steps to download, install and demo the library:
   git clone https://github.com/Muugii-bs/pyflow-customized.git
   cd pyflow/
   python setup.py build_ext -i
-  python prepare-video.py <input file> <fps> <skip>
+  python prepare-video.py <input file> <fps> <skip> <split>
 
   """
   prepare-video.py:
@@ -15,8 +15,9 @@ Run the following steps to download, install and demo the library:
       <input file>: the path/name of the target video
       <fps>: defines the "frames per second"
       <skip>: defines how many seconds skipped to choose the base image
+      <split>: defines the length (second) of sub videos
     output:
-      flow images saved in <input file> (without the '.jpg' extension) + '/flows'
+      flow images saved in <input file> (without the '.jpg' extension) + '/flows' + the number of sub video (0,1,2 ...)
   """
   ```
 

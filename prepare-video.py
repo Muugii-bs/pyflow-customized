@@ -12,7 +12,6 @@ import pyflow, cv2
 
 video_name, fps, skip_seconds, step = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
 frames_path = video_name.split('.')[0]
-#flows_path = frames_path + '/flows'
 
 def getLength(filename):
   result = subprocess.Popen(["ffprobe", filename],
@@ -24,7 +23,7 @@ def getLength(filename):
 
 def create_flows_path():
     duration = getLength(video_name)
-    for i in range(1, int(duration / step + 1)):
+    for i in range(0, int(duration / step)):
         os.system("mkdir -m 755 {0}".format(frames_path + '/flows' + str(i)))
 
 
@@ -74,27 +73,26 @@ if __name__ == '__main__':
     create_frames()
     print('frames path: {0}'.format(frames_path))
     create_flows_path()
-    """
+
     # Get the base & target images
     base_num = int(fps) * skip_seconds + 1
-    base_img = None
 
     for f in os.listdir(frames_path):
         if f.endswith('.jpg'):
-            frame_num = int(f.split('.')[0])
-            if frame_num < base_num:
+            frame_num = int(f.split('.')[0]) - 1
+            chunk_num = int(frame_num / (int(fps) * step))
+            local_num = frame_num % (int(fps) * step)
+            if local_num < base_num:
                 continue
-            if frame_num == base_num:
+            if local_num == base_num:
                 base_img = np.array(Image.open(frames_path + '/' + f))
                 base_img = base_img.astype(float) / 255.
                 continue
-            if base_img is not None:
-                target_img = np.array(Image.open(frames_path + '/' + f))
-                target_img = target_img.astype(float) / 255.
+            target_img = np.array(Image.open(frames_path + '/' + f))
+            target_img = target_img.astype(float) / 255.
 
             create_flows(base_img, target_img, 
-                '{0}/wrappImage{1}.png'.format(flows_path, str(frame_num)), 
-                '{0}/flowImage{1}.jpg'.format(flows_path, str(frame_num)))
-    print('flows path: {0}'.format(flows_path))
-    """
+                '{0}/wrappImage{1}.png'.format(frames_path + '/flows' + str(chunk_num), str(frame_num)), 
+                '{0}/flowImage{1}.jpg'.format(frames_path + '/flows' + str(chunk_num), str(frame_num)))
+    print('flows path: {0}'.format(frames_path))
 
